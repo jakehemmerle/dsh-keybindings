@@ -97,11 +97,38 @@ No product red→green pair yet: S8's planned mutants (Medium=Low colour, light
 palette dropped, Alt+P meta guard dropped, Shift+Tab capability check,
 in-flight guard) are the round-2 work that must be caught by these suites.
 
-## Mutation and flake checks (S8, round 2)
+## Mutation results (S8, round 2)
 
-Pending: plant each mutant in an isolated copy, rebuild the patched package,
-and record which property kills it (target N/N). Flake check: loop each e2e
-file ≥ 5×.
+Method: each mutant is planted in an isolated copy of the committed tree
+(`git archive HEAD` → `/tmp/keys-mutants/<id>`), the patch file mutated with
+hunk headers recomputed, the package rebuilt with its unit install check
+disabled, and all three layers run against the mutant build: unit
+(`test/omp-keys.test.mjs`), fast (`test/fast/*.test.mjs`, 300 runs, seed
+424242) and e2e (real dsh-TUI campaigns, 8 cases per surface, seed 999). Raw
+logs: `/tmp/keys-mutants-evidence/<id>-{build,unit,fast,e2e}.log`.
+
+| Mutant (change) | Unit | Fast — killed by | E2E — killed by |
+|---|---|---|---|
+| **mediumIsLow** — dark palette `medium: '#0088fa'` → Low's `#178fb9` | survived (no hex assertions in the unit suite) | **caught** — `P-10: every omp palette hex` ("dark/medium hex #0088fa missing") | **caught** — chat property, I-7 glyph colour (replay `FC_SEED=999 FC_PATH=3:1:1:0:1:1`) |
+| **lightDropped** — `ompTierColor` always uses the dark palette | survived | survived (all hexes still present, by design) | **caught** — chat property I-7, light-theme tier index mismatch |
+| **metaGuard v1** — `key.meta &&` dropped from the Alt+P guard | survived | survived | **dead mutation, replaced**: dsh-TUI's printable-insert path returns before the guard, so plain `p` still types (probe capture against the mutant build); observationally equivalent |
+| **metaGuardCtrl (v2)** — `!key.ctrl` dropped from both Alt+P guards | survived | **caught** — `P-04 contract: the Alt+P meta guard excludes ctrl/super/shift` | survived — Ctrl+P reaches the prompt as a control character, not `input === 'p'` (ctrlP action ran on both surfaces, no picker opened); guard weakening is a source-level regression |
+| **capabilityCheck** — guard replaced with `if (false)` | survived | **caught** — `P-01 contract: the Shift+Tab capability guard` | survived — the branch is unreachable in the rig (dsh always declares effort capability for the mock route); documented unreachability |
+| **inFlightGuard** — pending-press drop removed | **caught** — "presses while a step is pending are dropped, not raced" | **caught** — `P-05` concurrent-calls property (exactly one `setEffort` under k in-flight calls) | survived — the e2e burst oracle deliberately allows 1..k advances because tmux delivery timing makes exactly-one unassertable |
+
+**Caught 5/5** — every planted mutant fails at least one suite layer (fast
+contract minimum, unit for the in-flight guard, and the real-client e2e suite
+for both colour mutants). Two mutants survived their first form and the tests
+were strengthened until they failed (`4309eaf`): the meta-guard source
+contract plus the Ctrl+P inertness action, and the capability-guard source
+contract. No silent survives; every survive above carries its reason.
+
+### Flake loops (5× full TUI campaigns, second seed)
+
+Seed **424242**, 25 runs per surface per loop, committed suite at
+`18d9086`: **5/5 loops green** (both surfaces, I-1..I-7 after every step),
+durations 428–441 s per loop. Both recorded seeds now: 20261011 (round 1) and
+424242 (round 2).
 
 ## Evidence
 

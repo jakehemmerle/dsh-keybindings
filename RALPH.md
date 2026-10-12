@@ -33,32 +33,26 @@ Bead states after round 1: S1, S2, S3, S4, S6 closed (see `bd list`); S5
 closed if the web campaign finished green this round; S7 closed with
 TESTING.md; S8 (mutants) and S9 (release) open for rounds 2–3.
 
-## Round 2 (next)
+## Round 2 (2026-10-12) — done (fresh-start resume)
 
-1. `bd ready` → work **keys-fkd.8 (S8 Bugs and mutants)**: plant ≥3 mutants
-   (colour Medium=Low, light palette dropped, Alt+P meta guard dropped,
-   Shift+Tab capability check, in-flight guard) one at a time in an isolated
-   copy, rebuild `.#dsh-keybindings`, and record which property kills each
-   (target caught N/N in TESTING.md). A survivor means a strengthened test.
-2. Run `nix flake check` (S3 acceptance; `checks.fast` now has `test/fast/`).
-3. Loop each e2e file 5× for flakes (a failure is a bug).
-4. Consider a second TUI campaign seed (e.g. 424242) for seed diversity.
+S8 mutants executed and closed; flake loops green. Commits:
+- `4309eaf` strengthen meta-guard coverage: Ctrl+P inertness action on both surfaces + Alt+P/Shift+Tab guard source contracts
+- TESTING.md S8 mutant table + flake-loop results (this round's final commit)
 
-## Round 3 (release)
+Mutant results (full table in TESTING.md): caught 5/5 —
+mediumIsLow (fast P-10 + e2e I-7), lightDropped (e2e I-7 light),
+metaGuardCtrl (fast P-04 contract), capabilityCheck (fast P-01 contract),
+inFlightGuard (unit + fast P-05). Two survived their first form and were
+strengthened until they failed; every survive carries its documented reason
+(dead mutation, control-character input, unreachable branch, or deliberately
+permissive e2e burst oracle). Flake loops: 5/5 green on seed 424242
+(25 runs/surface per loop, 428–441 s each) — both seeds now recorded.
+
+Bead states after round 2: S1–S8 closed; open: epic, S9 (release) for round 3.
+
+## Round 3 (next)
 
 S9: RELEASING.md + CHANGELOG.md, version bump if needed, and if everything is
 green: `nix flake check` + full-suite release run (≥100 generated cases per
-surface over ≥3 seeds), annotated tag `v0.1.0-alpha.1`, push with tag.
-
-## Gotchas learned
-
-- The e2e runner and `checks.fast` read the flake's `testSrc`; commit test
-  files before `nix run .#e2e` so the store source is current.
-- `nix build` leaves `result*` symlinks (gitignored); store paths change when
-  the tree hash changes.
-- The chat header can be prefixed by logo glyphs (`▀`); parse by line-end
-  shape. The footer truncates at cols ≤ 60; the header shows the label, the
-  footer the id.
-- fast-check: await every `fc.assert` on async properties (module-global
-  `inFlight` otherwise collides across tests); `fc.stringMatching` exists,
-  `fc.hexaString` does not (v4).
+surface over ≥3 seeds), annotated tag `v0.1.0-alpha.1`, push with tag. Held
+until the lead's ROUND B (Jake deciding scope).
