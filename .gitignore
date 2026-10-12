@@ -2,3 +2,14 @@
 *.rej
 node_modules/
 .DS_Store
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+*.gate.lock*
+
+# Nix build result symlinks
+/result
+/result-*
