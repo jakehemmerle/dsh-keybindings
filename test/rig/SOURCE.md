@@ -10,5 +10,6 @@ Local changes (keep them when re-vendoring):
 - `startTui`: every tmux call passes `-f /dev/null`, so the private `-L` server never reads a user tmux config.
 - `startTui`: adds `captureEscapes()` (`capture-pane -e`), used by the prompt-glyph colour oracle.
 - `startTui`: also passes `COLORTERM` from the profile env (truecolor runs for exact colour oracles; empty means 256 colours).
+- `startTui.text()`/`submit()`: `send-keys -l` passes `--` before the text, so drafts starting with `-` (generated hostile input) are not parsed as tmux flags (found by the seed-20261011 property run, `unknown flag -p`).
 
 `mock-llm.mjs` is unchanged.

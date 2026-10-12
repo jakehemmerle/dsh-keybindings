@@ -189,8 +189,8 @@ export function startTui(profile, { cols = 150, rows = 40, args = [] } = {}) {
     socket, capture, captureEscapes,
     /** tmux key names: 'Enter', 'Escape', 'M-BSpace' (Option+Backspace), 'C-w', 'BTab' (Shift+Tab), 'M-Left'. */
     keys: (...keys) => tmux('send-keys', '-t', 'rig', ...keys),
-    /** Literal text, no key-name parsing. */
-    text: (s) => tmux('send-keys', '-t', 'rig', '-l', s),
+    /** Literal text, no key-name parsing; '--' keeps leading dashes out of tmux's flags. */
+    text: (s) => tmux('send-keys', '-t', 'rig', '-l', '--', s),
     /** Raw bytes, e.g. '\x1b\x7f' for a Meta-sending terminal's Option+Backspace. */
     raw: (s) => tmux('send-keys', '-t', 'rig', '-H', ...Buffer.from(s, 'utf8').toString('hex').match(/../g)),
     async waitFor(pattern, { timeout = 30000, not = false } = {}) {
@@ -211,7 +211,7 @@ export function startTui(profile, { cols = 150, rows = 40, args = [] } = {}) {
      * until: RegExp on the screen, or () => boolean (e.g. () => mock.turns().length > n).
      */
     async submit(str, { until, attempts = 3 } = {}) {
-      tmux('send-keys', '-t', 'rig', '-l', str);
+      tmux('send-keys', '-t', 'rig', '-l', '--', str);
       const tail = str.slice(-20).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const echoDeadline = Date.now() + 10000;
       while (!new RegExp(tail).test(capture())) {
