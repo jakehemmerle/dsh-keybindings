@@ -120,6 +120,18 @@ test('P-10: every omp palette hex (dark and light) is present in the glyph sourc
   }
 });
 
+test('P-04 contract: the Alt+P meta guard excludes ctrl/super/shift on both prompts', async () => {
+  const prompt = await source('components/PromptInput.js');
+  assert.match(prompt, /key\.meta && !key\.ctrl && !key\.super && !key\.shift && input === 'p'/);
+  const launchpad = await source('screens/Launchpad.js');
+  assert.match(launchpad, /key\.meta && !key\.ctrl && !key\.super && !key\.shift && input === 'p' && onParamPick !== undefined/);
+});
+
+test('P-01 contract: the Shift+Tab capability guard is present in the chat prompt', async () => {
+  const prompt = await source('components/PromptInput.js');
+  assert.match(prompt, /channel\.backendCapabilities\?\.effort === false/);
+});
+
 test('patch-presence contract: the unpatched control build has no effortCycle module', { skip: !process.env.DSH_TUI_BASE_TYPES && 'DSH_TUI_BASE_TYPES unset (nix checks set it)' }, async () => {
   const base = process.env.DSH_TUI_BASE_TYPES;
   await assert.rejects(() => import(pathToFileURL(join(base, 'effortCycle.js')).href));

@@ -16,6 +16,7 @@ const seedState = (ladder) => fc.oneof(
 );
 
 const launchpadAction = fc.oneof(
+  { weight: 1, arbitrary: fc.constant({ t: 'ctrlP' }) },
   { weight: 5, arbitrary: fc.constant({ t: 'shiftTab' }) },
   { weight: 1, arbitrary: fc.integer({ min: 2, max: 4 }).map((k) => ({ t: 'burst', k })) },
   { weight: 2, arbitrary: fc.constant({ t: 'altP' }) },
@@ -24,6 +25,7 @@ const launchpadAction = fc.oneof(
   { weight: 1, arbitrary: fc.constant({ t: 'restart' }) },
 );
 const chatAction = fc.oneof(
+  { weight: 1, arbitrary: fc.constant({ t: 'ctrlP' }) },
   { weight: 5, arbitrary: fc.constant({ t: 'shiftTab' }) },
   { weight: 1, arbitrary: fc.integer({ min: 2, max: 4 }).map((k) => ({ t: 'burst', k })) },
   { weight: 2, arbitrary: fc.constant({ t: 'altP' }) },

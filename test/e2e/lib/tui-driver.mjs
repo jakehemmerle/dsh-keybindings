@@ -175,6 +175,14 @@ export class TuiCase {
     await this.settle('Alt+P, Esc');
   }
 
+  /** Ctrl+P must be inert: no picker (I-5), draft untouched (I-4). The meta guard excludes ctrl. */
+  async ctrlP() {
+    this.count('ctrlP:' + this.screen);
+    this.tui.keys('C-p');
+    await sleep(600);
+    await this.settle('Ctrl+P');
+  }
+
   async type(s) {
     this.count(`type:${this.screen}`);
     if (/[pP]/.test(s)) this.count('type:p');
@@ -243,6 +251,7 @@ export class TuiCase {
       case 'shiftTab': return this.shiftTab();
       case 'burst': return this.burst(action.k);
       case 'altP': return this.altP();
+      case 'ctrlP': return this.ctrlP();
       case 'type': return this.type(action.s);
       case 'backspace': return this.backspace();
       case 'submit': return this.submit();
