@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import fc from 'fast-check';
 import { startMockLlm } from '../../rig/mock-llm.mjs';
-import { makeProfile, paths, sleep } from '../../rig/rig.mjs';
+import { makeProfile, paths, sleep, startWeb } from '../../rig/rig.mjs';
 import { LEVELS, wire } from './oracle.mjs';
 
 export { fc, sleep };
@@ -76,6 +76,19 @@ export async function tuiFixture({ ladder, theme, seedEffort }) {
   return {
     mock, profile,
     async dispose() { try { profile.dispose(); } finally { await mock.close(); } },
+  };
+}
+
+/** A fresh mock + isolated dsh web profile (this repo has no web half); dispose() tears both down. */
+export async function webFixture() {
+  const mock = await startMockLlm({ script: () => ({ text: 'pong' }) });
+  const profile = makeProfile({ kind: 'web', mock });
+  const web = await startWeb(profile);
+  return {
+    mock, profile, web,
+    async dispose() {
+      try { await web.stop(); } finally { try { profile.dispose(); } finally { await mock.close(); } }
+    },
   };
 }
 

@@ -118,7 +118,7 @@
             ln -s ${b.nodeModules}/node_modules node_modules
             export HOME=$TMPDIR NUM_RUNS=${"$"}{NUM_RUNS:-1000}
             export DSH_TUI_TYPES=${b.patched}/${tuiDir}/lib/types DSH_TUI_BASE_TYPES=${b.base}/${tuiDir}/lib/types
-            node --test test/omp-keys.test.mjs test/fast/ 2>&1 | tee $out
+            node --test test/omp-keys.test.mjs test/fast/*.test.mjs 2>&1 | tee $out
           '';
         });
 
