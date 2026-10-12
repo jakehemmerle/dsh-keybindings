@@ -1,0 +1,29 @@
+{
+  "name": "dsh-keybindings",
+  "version": "0.1.0-alpha.1",
+  "description": "omp's effort and model keys for dsh-TUI 0.14.0 (Shift+Tab effort, Alt+P model picker, /permissions, effort-tinted prompt glyph), as a version-pinned source patch",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "repository": "github:jakehemmerle/dsh-keybindings",
+  "scripts": {
+    "test": "node --test test/omp-keys.test.mjs test/fast/*.test.mjs",
+    "test:e2e": "node --test --test-concurrency=1 test/e2e/*.test.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-harness-tui/dsh-tui": "0.14.0",
+    "@deepseek-ai/dsh": "0.2.1-alpha.2"
+  },
+  "devDependencies": {
+    "fast-check": "4.10.2",
+    "playwright-core": "1.59.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-harness-tui/dsh-tui": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh": {
+      "optional": true
+    }
+  }
+}
