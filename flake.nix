@@ -79,7 +79,7 @@
               mkdir -p "$root/home"
               ${exports}
               cd "$root/src"
-              if [ $# -eq 0 ]; then set -- test/e2e/; fi
+              if [ $# -eq 0 ]; then set -- test/e2e/*.test.mjs; fi
               status=0
               env -i PATH="$PATH" HOME="$root/home" TMPDIR="$root" TERM=xterm-256color LANG=C.UTF-8 \
                 DSH_BIN="$DSH_BIN" DSH_TUI_DIR="$DSH_TUI_DIR" DSH_TUI_BASE_DIR="$DSH_TUI_BASE_DIR" \
