@@ -93,9 +93,9 @@ carry, persistence, wrap and the preset readout all held):
    the failing evidence, then fix commit `8d2defa` (`--` before literal text
    in `text()`/`submit()`).
 
-No product red→green pair yet: S8's planned mutants (Medium=Low colour, light
-palette dropped, Alt+P meta guard dropped, Shift+Tab capability check,
-in-flight guard) are the round-2 work that must be caught by these suites.
+No product red→green pair exists: the S8 mutants below were all caught in
+round 2, and the round-3 audit found no product defect either (pair 5 there
+is a harness defect).
 
 ## Mutation results (S8, round 2)
 
@@ -130,7 +130,7 @@ Seed **424242**, 25 runs per surface per loop, committed suite at
 durations 428–441 s per loop. Both recorded seeds now: 20261011 (round 1) and
 424242 (round 2).
 
-## Round 3 (release, Round C) — in progress
+## Round 3 (release, Round C) — done
 
 Closure audit (this round): every closed bead S1-S8 re-verified against its
 recorded evidence — commit shas exist, S1 md5 `97fd5507744a027af51993f1ac810b4b`
@@ -150,7 +150,63 @@ New red on the release gate:
    replay commands). Harness/tooling defect in the S3 flake runner, not a
    product defect; S3's recorded evidence (flake check green, 9/9 unit
    install checks, e2e app present) was re-verified true this round.
-   Repro: `nix run .#e2e` with no arguments. Fix follows in a red -> fix pair.
+   Repro: `nix run .#e2e` with no arguments. **Fix`59230f9`**: the runner
+   default expands `test/e2e/*.test.mjs` (verified by a default-invocation
+   smoke: 3/3 pass, `FC_SEED=424242 NUM_RUNS=1`, dsh `0.2.1-alpha.2`).
+   Product code untouched; this pair is harness-only.
+
+### Release campaign (Round C, 2026-10-12, committed tree `59230f9`)
+
+Runner: the e2e app's **default invocation** (`nix run .#e2e`, no args) after
+the fix above — the same path the gate prescribes. 25 generated cases per
+surface per seed × 5 seeds = **125 ≥ 100 cases per surface over 5 ≥ 3 seeds**,
+seeds logged below and replayable with `FC_SEED`/`FC_PATH`; `424242`
+included per the release-brief instruction, `20261011` (regression) and
+`999` (mutant-campaign) retained, `8675309` and `20261012` fresh. Raw jsonl
+evidence committed at `release-evidence/seed-<seed>/{tui-property,web-inertness}.jsonl`
+(full captures in the same directory, gitignored).
+
+| Seed | TUI Launchpad | TUI chat | web inertness | duration |
+|---|---|---|---|---|
+| 424242 | pass 25/25 | pass 25/25 | pass 25/25 (composer 25 / turn 25 / inert 25) | 484 s |
+| 20261011 | pass 25/25 | pass 25/25 | pass 25/25 | 490 s |
+| 999 | pass 25/25 | pass 25/25 | pass 25/25 | 447 s |
+| 8675309 | pass 25/25 | pass 25/25 | pass 25/25 | 453 s |
+| 20261012 | pass 25/25 | pass 25/25 | pass 25/25 | 465 s |
+
+All 15 suite runs (5 seeds × {launchpad, chat, web}) report `failed: false`
+with I-1..I-7 checked after **every step** and P-02's serialized
+`reasoning_effort` carry on every submitted turn. Summed coverage buckets
+across the 250 real-client TUI cases (launchpad/chat; full per-seed buckets
+are in the committed jsonl): shiftTab presses 205/157 (incl. 56 wraps and
+43 no-ladder steps), bursts 37/27, Alt+P 61/67, Ctrl+P meta-guard actions
+32/33, `/permissions` 36 (chat), typing incl. `p`/`P` 57/42,
+backspaces 40/24, restarts 29/31, `effort.json` seed states none 39 /
+corrupt 51 / valid 35 per surface, ladders 0–6 including the degenerate
+0- and 1-ladder cases, themes dark 64 / light 61, widths 60/100/140 cols.
+**126/126 web cases** (125 campaign + the default-invocation smoke's 1 case,
+`FC_SEED=424242 NUM_RUNS=1`): composer/turn/inert buckets measured in
+every case; zero console or page errors.
+
+Fast suites at the release runs: `test/fast/properties.test.mjs`
+**11/11 pass at `NUM_RUNS=1000`** (all properties + unit examples + the
+P-04 Alt+P meta-guard contract and P-01 Shift+Tab capability contract from
+`4309eaf`) at seeds **424242** and **20261011**, against the built
+`lib/types` of the patched package (`/nix/store/qx8f47m92mznh2fpm39v23a97lrkr2ih-…`)
+and the base control (`/nix/store/zps5ic86gixb2fdix05vzmxrkwi2nhxs-…`,
+`DSH_TUI_BASE_TYPES` set — the unpatched-control contract runs and passes).
+Plus harness-check-independent evidence: `nix flake check` green
+(`patched`/`standalone` unit install checks 9/9 + sandbox `fast` at the
+default `NUM_RUNS=1000`). The five campaign runs on the committed tree are
+also 5/5 consecutive green e2e invocations (the round-2 flake-loop shape);
+per-seed wall times 447–490 s.
+
+DSH channels re-checked 2026-10-12 for the release record (`npm view
+@deepseek-ai/dsh dist-tags`): `latest`/`next` = 0.2.0-rc.2,
+`alpha` = 0.2.1-alpha.2 — the fleet alpha remains the newest DSH; no newer
+beta/stable requires qualification this release. S8 mutants stay caught 5/5
+(each suite was re-exercised at release budgets above; no mutant-related
+regression was planted or released).
 
 ## Evidence
 

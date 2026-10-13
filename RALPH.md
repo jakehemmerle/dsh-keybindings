@@ -50,9 +50,44 @@ permissive e2e burst oracle). Flake loops: 5/5 green on seed 424242
 
 Bead states after round 2: S1–S8 closed; open: epic, S9 (release) for round 3.
 
-## Round 3 (next)
+## Round 3 (final, lead's ROUND C — Jake authorized full completion) — done
 
-S9: RELEASING.md + CHANGELOG.md, version bump if needed, and if everything is
-green: `nix flake check` + full-suite release run (≥100 generated cases per
-surface over ≥3 seeds), annotated tag `v0.1.0-alpha.1`, push with tag. Held
-until the lead's ROUND B (Jake deciding scope).
+**STEP 0 closure audit first**: every closed bead S1–S8 re-verified against
+its recorded evidence — referenced shas exist in history (f415e62 1f17cfc
+97adab4 74c708f 8d2defa 8982f70 74c708f a8cf280 4309eaf 1d79ab9 068fe11), S1's
+md5 `97fd5507744a027af51993f1ac810b4b` re-run identical to the deployed
+nix-config copy and test file identical, S4 greps clean of `~/.agents`
+imports, S8's `/tmp/keys-mutants-evidence` logs still on disk, TESTING.md
+has no contradiction footnotes, zero deferred or bug-type beads. **No
+reopen.** The only S2/S3-class finding was a harness defect *outside* any
+closed bead's recorded path: the flake e2e runner's default argument was
+never exercised and fails on node 24.21 (`node --test <dir>` is a module
+entrypoint). Red commit `5e721fc` (all five first campaign-seed attempts
+died <=4 s with MODULE_NOT_FOUND before a single case ran), fix commit
+`59230f9` (default expands `test/e2e/*.test.mjs`; default-invocation
+smoke 3/3 pass). The closed beads' recorded evidence itself all re-verifies
+true, so closures stand; the pair is attributed to the release gate.
+
+**STEP 1 release gate, all green on committed tree `59230f9`:**
+- `nix flake check` green: patched/standalone builds with unit install
+  checks 9/9 + sandbox `fast` check at the default NUM_RUNS=1000.
+- Release campaign: **125 real-client cases per surface over 5 seeds**
+  (`424242`, `20261011`, `999`, `8675309`, `20261012`): TUI
+  Launchpad 125/125, TUI chat 125/125 (I-1..I-7 after every step, P-02 wire
+  carry on every submitted turn), web inertness 126/126 (campaign 125 +
+  default-invocation smoke 1); zero console/page errors; seeds logged, `FC_SEED`/`FC_PATH` replayable; raw jsonl committed under
+  `release-evidence/`. Wall time 447–490 s per seed, 39 min total.
+- Fast suites: **11/11 at `NUM_RUNS=1000`** at seeds `424242` and
+  `20261011` (unpatched control via `DSH_TUI_BASE_TYPES` included).
+- DSH channels re-checked 2026-10-12: latest/next 0.2.0-rc.2, alpha
+  0.2.1-alpha.2 — the fleet alpha remains newest; no qualification jump.
+- S8 mutants stay caught 5/5 (no regression planted or released this round).
+- Red -> fix found this round: pair 5 (e2e runner default), harness-only;
+  full table in TESTING.md.
+
+Release: RELEASING.md + CHANGELOG.md written; package.json stays
+`0.1.0-alpha.1` (first tagged release: the artifact is byte-identical to
+the deployed copy, so there is no pre-existing published version to bump;
+the tag records the first qualified revision); annotated tag
+`v0.1.0-alpha.1` on the release commit; commit + tag pushed; preflight run
+per the skill's rules. Board closed with keys-fkd.9 and the epic closed last.

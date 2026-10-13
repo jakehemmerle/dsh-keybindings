@@ -13,3 +13,7 @@ node_modules/
 # Nix build result symlinks
 /result
 /result-*
+
+# Local campaign/test evidence (jsonl summaries are force-added)
+/release-evidence/
+/test-results/
