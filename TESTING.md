@@ -130,6 +130,28 @@ Seed **424242**, 25 runs per surface per loop, committed suite at
 durations 428–441 s per loop. Both recorded seeds now: 20261011 (round 1) and
 424242 (round 2).
 
+## Round 3 (release, Round C) — in progress
+
+Closure audit (this round): every closed bead S1-S8 re-verified against its
+recorded evidence — commit shas exist, S1 md5 `97fd5507744a027af51993f1ac810b4b`
+still equal to the deployed nix-config copy (md5sum re-run this round), S4
+greps clean of `~/.agents` imports, S8's `/tmp/keys-mutants-evidence` logs
+still on disk, zero deferred or bug-type beads — **no reopen**.
+
+New red on the release gate:
+
+5. **e2e runner default argument** (red, release round C): the flake's
+   `apps.e2e` default `set -- test/e2e/` fails on node 24.21 — `node --test
+   <dir>` treats the positional as a module entrypoint
+   (`Cannot find module '.../dsh-keybindings-e2e.*/src/test/e2e'`,
+   `MODULE_NOT_FOUND`) and every campaign seed (424242, 20261011, 999,
+   8675309, 20261012) exited 1 within <=4 s, before any case ran. Rounds 1-2
+   never exercised the default (they passed explicit file args per the
+   replay commands). Harness/tooling defect in the S3 flake runner, not a
+   product defect; S3's recorded evidence (flake check green, 9/9 unit
+   install checks, e2e app present) was re-verified true this round.
+   Repro: `nix run .#e2e` with no arguments. Fix follows in a red -> fix pair.
+
 ## Evidence
 
 Raw evidence (jsonl logs, failure captures with screen text and SGR streams):
